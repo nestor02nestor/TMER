@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Setup Java
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
@@ -27,6 +27,12 @@ jobs:
           flutter-version: '3.16.5'
           channel: 'stable'
           cache: true
+      
+      - name: Create required files
+        run: |
+          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
+          mkdir -p android/app/src/main/res/values/
+          echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><resources><string name=\"app_name\">Flutter Clock</string></resources>" > android/app/src/main/res/values/strings.xml
       
       - name: Install dependencies
         run: |
@@ -44,10 +50,11 @@ jobs:
             -keysize 2048 \
             -validity 10000 \
             -dname "CN=Android Debug,O=Android,C=US" \
-            -storetype JKS
+            -storetype PKCS12
       
       - name: Build APK
-        run: flutter build apk --release --split-per-abi
+        run: |
+          flutter build apk --release --split-per-abi
           
       - name: Create Release
         uses: ncipollo/release-action@v1
@@ -58,7 +65,14 @@ jobs:
           name: Release v1.0.${{ github.run_number }}
           body: |
             Flutter Clock App Release
+            
+            Features:
             - Digital Clock with 12/24 hour format
             - Date display
             - Countdown timer
             - Dark/Light theme
+            
+            APK Files:
+            - app-arm64-v8a-release.apk (for modern Android devices)
+            - app-armeabi-v7a-release.apk (for older Android devices)
+            - app-x86_64-release.apk (for Android emulators)
