@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '11'
       
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -32,13 +32,17 @@ jobs:
       
       - name: Create local.properties
         run: |
-          echo "flutter.sdk=$FLUTTER_HOME" > android/local.properties
+          touch android/local.properties
+          echo "flutter.sdk=$GITHUB_WORKSPACE/flutter" > android/local.properties
           
       - name: Install dependencies
         run: |
           flutter pub get
           flutter clean
           
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+        
       - name: Generate debug keystore
         run: |
           cd android/app
