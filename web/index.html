@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flutter Clock App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f0f0f0;
+    }
+    .clock-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .time {
+      font-size: 3.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .date {
+      font-size: 1.5rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    .countdown {
+      margin-top: 2rem;
+    }
+    button {
+      background: #2196F3;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      margin: 0.5rem;
+    }
+    button:hover {
+      background: #1976D2;
+    }
+    .dark-mode {
+      background-color: #333;
+      color: white;
+    }
+    .dark-mode .clock-container {
+      background: #424242;
+      color: white;
+    }
+    .dark-mode .date {
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock-container">
+    <div class="time" id="time">00:00:00</div>
+    <div class="date" id="date">2025-01-12</div>
+    <button onclick="toggleTimeFormat()">Toggle 12/24</button>
+    <button onclick="toggleTheme()">Toggle Theme</button>
+    <div class="countdown">
+      <div id="countdown">00:00:00</div>
+      <button onclick="startCountdown()">Start Timer</button>
+      <button onclick="stopCountdown()" id="stopBtn" style="display: none;">Stop</button>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
