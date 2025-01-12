@@ -14,6 +14,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       
       - name: Set up JDK
         uses: actions/setup-java@v3
@@ -28,12 +30,10 @@ jobs:
           channel: 'stable'
           cache: true
       
-      - name: Create required files
+      - name: Create local.properties
         run: |
-          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-          mkdir -p android/app/src/main/res/values/
-          echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><resources><string name=\"app_name\">Flutter Clock</string></resources>" > android/app/src/main/res/values/strings.xml
-      
+          echo "flutter.sdk=$FLUTTER_HOME" > android/local.properties
+          
       - name: Install dependencies
         run: |
           flutter pub get
@@ -41,8 +41,9 @@ jobs:
           
       - name: Generate debug keystore
         run: |
+          cd android/app
           keytool -genkeypair \
-            -keystore android/app/debug.keystore \
+            -keystore debug.keystore \
             -storepass android \
             -keypass android \
             -alias androiddebugkey \
@@ -51,6 +52,7 @@ jobs:
             -validity 10000 \
             -dname "CN=Android Debug,O=Android,C=US" \
             -storetype PKCS12
+          cd ../..
       
       - name: Build APK
         run: |
