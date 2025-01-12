@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v3
@@ -17,34 +19,46 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
       
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.16.5'
           channel: 'stable'
+          cache: true
       
-      - name: Get dependencies
-        run: flutter pub get
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          flutter clean
+          
+      - name: Generate debug keystore
+        run: |
+          keytool -genkeypair \
+            -keystore android/app/debug.keystore \
+            -storepass android \
+            -keypass android \
+            -alias androiddebugkey \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -storetype JKS
       
       - name: Build APK
-        run: flutter build apk --release
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
+        run: flutter build apk --release --split-per-abi
           
       - name: Create Release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v1
+        uses: ncipollo/release-action@v1
         with:
-          files: build/app/outputs/flutter-apk/app-release.apk
-          tag_name: v1.0.${{ github.run_number }}
+          artifacts: "build/app/outputs/flutter-apk/*.apk"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: v1.0.${{ github.run_number }}
           name: Release v1.0.${{ github.run_number }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            Flutter Clock App Release
+            - Digital Clock with 12/24 hour format
+            - Date display
+            - Countdown timer
+            - Dark/Light theme
